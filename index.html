@@ -1,433 +1,455 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>智慧飲食與熱量體態教練</title>
-<style>
-:root {
---primary: #10b981;
---bg: #f8fafc;
---card-bg: #ffffff;
---text: #0f172a;
---text-sub: #64748b;
---border: #e2e8f0;
---danger: #ef4444;
---info: #3b82f6;
-}
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 16px; padding-bottom: 60px; }
-.card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-h2 { margin: 0 0 14px 0; font-size: 1.15rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>智慧飲食與熱量體態教練</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --info: #3b82f6;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 16px; padding-bottom: 60px; }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    h2 { margin: 0 0 14px 0; font-size: 1.15rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* 原生展開樣式優化 */
+    details summary { list-style: none; cursor: pointer; outline: none; user-select: none; }
+    details summary::-webkit-details-marker { display: none; }
+    
+    .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .input-col { flex: 1; }
+    .input-col label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; font-weight: bold; }
+    input[type="number"], input[type="password"], input[type="text"], select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 0.9rem; background: #fff; }
+    
+    .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+    .metric-box { background: #f1f5f9; padding: 12px; border-radius: 12px; }
+    .metric-title { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+    .metric-val { font-size: 1.1rem; font-weight: bold; }
+    .metric-val span { font-size: 0.8rem; color: var(--text-sub); font-weight: normal; }
+    
+    .bar-bg { background: #e2e8f0; border-radius: 999px; height: 8px; overflow: hidden; margin-top: 6px; }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
+    .bar-cal { background: var(--primary); }
+    .bar-protein { background: #6366f1; }
+    .bar-carb { background: #f59e0b; }
+    .bar-fat { background: #ec4899; }
+    .bar-sodium { background: var(--danger); }
+    .bar-water { background: var(--info); }
 
-.input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-.input-col { flex: 1; }
-.input-col label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; font-weight: bold; }
-input[type="number"], input[type="password"], input[type="text"], select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 0.9rem; background: #fff; }
+    .btn-camera { display: block; width: 100%; padding: 14px; background: var(--primary); color: #fff; text-align: center; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    .btn-action { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-action:disabled { background: #94a3b8; }
+    .btn-small { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
+    .btn-save { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 4px; }
 
-.metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
-.metric-box { background: #f1f5f9; padding: 12px; border-radius: 12px; }
-.metric-title { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
-.metric-val { font-size: 1.1rem; font-weight: bold; }
-.metric-val span { font-size: 0.8rem; color: var(--text-sub); font-weight: normal; }
-
-.bar-bg { background: #e2e8f0; border-radius: 999px; height: 8px; overflow: hidden; margin-top: 6px; }
-.bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
-.bar-cal { background: var(--primary); }
-.bar-protein { background: #6366f1; }
-.bar-carb { background: #f59e0b; }
-.bar-fat { background: #ec4899; }
-.bar-sodium { background: var(--danger); }
-.bar-water { background: var(--info); }
-
-.btn-camera { display: block; width: 100%; padding: 14px; background: var(--primary); color: #fff; text-align: center; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-.btn-action { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-.btn-action:disabled { background: #94a3b8; }
-.btn-small { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
-.btn-save { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 4px; }
-
-#previewBox { display: none; margin-top: 14px; text-align: center; }
-#previewImg { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; }
-#statusBox { margin-top: 10px; font-size: 0.85rem; padding: 10px; border-radius: 8px; display: none; line-height: 1.4; }
-.food-item { border-bottom: 1px solid var(--border); padding: 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
-.food-item:last-child { border-bottom: none; }
-</style>
+    #previewBox { display: none; margin-top: 14px; text-align: center; }
+    #previewImg { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; }
+    #statusBox { margin-top: 10px; font-size: 0.85rem; padding: 10px; border-radius: 8px; display: none; line-height: 1.4; }
+    .food-item { border-bottom: 1px solid var(--border); padding: 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
+    .food-item:last-child { border-bottom: none; }
+  </style>
 </head>
 <body>
 
-<!-- 1. 個人目標設定區塊 -->
-<div class="card">
-<h2 onclick="toggleSection('profileForm')" style="cursor: pointer;">
-⚙️ 個人目標設定 <span id="toggleIcon" style="font-size: 0.85rem; color: var(--info);">[展開設定]</span>
-</h2>
-<div id="profileForm" style="display: none;">
-<div class="input-row">
-<div class="input-col">
-<label>性別</label>
-<select id="userGender">
-<option value="male">男性</option>
-<option value="female">女性</option>
-</select>
-</div>
-<div class="input-col">
-<label>年齡</label>
-<input type="number" id="userAge" placeholder="例：30">
-</div>
-<div class="input-col">
-<label>身高 (cm)</label>
-<input type="number" id="userHeight" placeholder="例：175">
-</div>
-</div>
-<div class="input-row">
-<div class="input-col">
-<label>目前體重 (kg)</label>
-<input type="number" id="userWeight" placeholder="例：80" step="0.1">
-</div>
-<div class="input-col">
-<label>想減體重 (kg)</label>
-<input type="number" id="userGoalLoss" placeholder="例：5" step="0.5">
-</div>
-<div class="input-col">
-<label>預計天數 (天)</label>
-<input type="number" id="userDays" placeholder="例：30">
-</div>
-</div>
-<button class="btn-save" onclick="applyProfile()">💾 計算並套用專屬減重目標</button>
-<div id="planSummary" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; line-height: 1.4;"></div>
-</div>
-</div>
+  <!-- 1. 原生免 JS 展開卡片 -->
+  <details class="card" id="profileDetails">
+    <summary style="display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 1.15rem; font-weight: 700;">⚙️ 個人目標設定</span>
+      <span style="font-size: 0.85rem; color: var(--info);">[點擊展開/收合]</span>
+    </summary>
+    <div style="margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 12px;">
+      <div class="input-row">
+        <div class="input-col">
+          <label>性別</label>
+          <select id="userGender">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+          </select>
+        </div>
+        <div class="input-col">
+          <label>年齡</label>
+          <input type="number" id="userAge" placeholder="例：30">
+        </div>
+        <div class="input-col">
+          <label>身高 (cm)</label>
+          <input type="number" id="userHeight" placeholder="例：175">
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-col">
+          <label>目前體重 (kg)</label>
+          <input type="number" id="userWeight" placeholder="例：80" step="0.1">
+        </div>
+        <div class="input-col">
+          <label>想減體重 (kg)</label>
+          <input type="number" id="userGoalLoss" placeholder="例：5" step="0.5">
+        </div>
+        <div class="input-col">
+          <label>預計天數 (天)</label>
+          <input type="number" id="userDays" placeholder="例：30">
+        </div>
+      </div>
+      <button class="btn-save" onclick="applyProfile()">💾 計算並套用專屬減重目標</button>
+      <div id="planSummary" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; line-height: 1.4;"></div>
+    </div>
+  </details>
 
-<!-- 2. 全日動態看板 -->
-<div class="card">
-<h2>
-📊 今日全日看板
-<button class="btn-small" onclick="resetAll()">🔄 重置今天</button>
-</h2>
+  <!-- 2. 全日動態看板 -->
+  <div class="card">
+    <h2>
+      📊 今日全日看板
+      <button class="btn-small" onclick="resetAll()">🔄 重置今天</button>
+    </h2>
 
-<div class="metric-grid">
-<div class="metric-box">
-<div class="metric-title">🔥 熱量赤字預算</div>
-<div class="metric-val"><span id="cal-cur">0</span> / <span id="goal-cal">--</span> <span>kcal</span></div>
-<div class="bar-bg"><div class="bar-fill bar-cal" id="bar-cal" style="width: 0%"></div></div>
-</div>
-<div class="metric-box">
-<div class="metric-title">🥩 蛋白質目標</div>
-<div class="metric-val"><span id="pro-cur">0</span> / <span id="goal-pro">--</span> <span>g</span></div>
-<div class="bar-bg"><div class="bar-fill bar-protein" id="bar-pro" style="width: 0%"></div></div>
-</div>
-<div class="metric-box">
-<div class="metric-title">🍚 碳水化合物</div>
-<div class="metric-val"><span id="carb-cur">0</span> / <span id="goal-carb">--</span> <span>g</span></div>
-<div class="bar-bg"><div class="bar-fill bar-carb" id="bar-carb" style="width: 0%"></div></div>
-</div>
-<div class="metric-box">
-<div class="metric-title">🥑 脂肪控管</div>
-<div class="metric-val"><span id="fat-cur">0</span> / <span id="goal-fat">--</span> <span>g</span></div>
-<div class="bar-bg"><div class="bar-fill bar-fat" id="bar-fat" style="width: 0%"></div></div>
-</div>
-<div class="metric-box">
-<div class="metric-title">🥗 膳食纖維</div>
-<div class="metric-val"><span id="fib-cur">0</span> / 30 <span>g</span></div>
-</div>
-<div class="metric-box">
-<div class="metric-title">🧂 鈉含量 (消腫控管)</div>
-<div class="metric-val"><span id="sod-cur">0</span> / 2300 <span>mg</span></div>
-<div class="bar-bg"><div class="bar-fill bar-sodium" id="bar-sod" style="width: 0%"></div></div>
-</div>
-</div>
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="metric-title">🔥 熱量赤字預算</div>
+        <div class="metric-val"><span id="cal-cur">0</span> / <span id="goal-cal">--</span> <span>kcal</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-cal" id="bar-cal" style="width: 0%"></div></div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-title">🥩 蛋白質目標</div>
+        <div class="metric-val"><span id="pro-cur">0</span> / <span id="goal-pro">--</span> <span>g</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-protein" id="bar-pro" style="width: 0%"></div></div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-title">🍚 碳水化合物</div>
+        <div class="metric-val"><span id="carb-cur">0</span> / <span id="goal-carb">--</span> <span>g</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-carb" id="bar-carb" style="width: 0%"></div></div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-title">🥑 脂肪控管</div>
+        <div class="metric-val"><span id="fat-cur">0</span> / <span id="goal-fat">--</span> <span>g</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-fat" id="bar-fat" style="width: 0%"></div></div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-title">🥗 膳食纖維</div>
+        <div class="metric-val"><span id="fib-cur">0</span> / 30 <span>g</span></div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-title">🧂 鈉含量 (消腫控管)</div>
+        <div class="metric-val"><span id="sod-cur">0</span> / 2300 <span>mg</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-sodium" id="bar-sod" style="width: 0%"></div></div>
+      </div>
+    </div>
 
-<div style="background: #eff6ff; padding: 12px; border-radius: 12px; margin-top: 8px;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-<span style="font-size: 0.9rem; font-weight: bold; color: #1e40af;">💧 每日喝水進度 (<span id="water-cur">0</span> / <span id="goal-water">--</span> ml)</span>
-<div>
-<button class="btn-small" onclick="addWater(300)">+300ml</button>
-<button class="btn-small" onclick="addWater(500)">+500ml</button>
-</div>
-</div>
-<div class="bar-bg"><div class="bar-fill bar-water" id="bar-water" style="width: 0%"></div></div>
-</div>
-</div>
+    <div style="background: #eff6ff; padding: 12px; border-radius: 12px; margin-top: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 0.9rem; font-weight: bold; color: #1e40af;">💧 每日喝水進度 (<span id="water-cur">0</span> / <span id="goal-water">--</span> ml)</span>
+        <div>
+          <button class="btn-small" onclick="addWater(300)">+300ml</button>
+          <button class="btn-small" onclick="addWater(500)">+500ml</button>
+        </div>
+      </div>
+      <div class="bar-bg"><div class="bar-fill bar-water" id="bar-water" style="width: 0%"></div></div>
+    </div>
+  </div>
 
-<!-- 3. 餐點記錄區塊（保留空白輸入框，不預設填入） -->
-<div class="card">
-<h2>📸 記錄餐點</h2>
-<input type="password" id="apiKey" placeholder="請在此貼上 Gemini API Key (以 AIzaSy 開頭)">
-<input type="text" id="userNote" placeholder="餐點備註（例：外食偏油、白飯吃一半）">
+  <!-- 3. 餐點記錄區塊 -->
+  <div class="card">
+    <h2>📸 記錄餐點</h2>
+    <input type="password" id="apiKey" placeholder="請在此貼上 Gemini API Key (以 AIzaSy 開頭)">
+    <input type="text" id="userNote" placeholder="餐點備註（例：外食偏油、白飯吃一半）">
 
-<label for="cameraInput" class="btn-camera">📷 拍照或選取照片</label>
-<input type="file" id="cameraInput" accept="image/*" style="display: none;">
+    <label for="cameraInput" class="btn-camera">📷 拍照或選取照片</label>
+    <input type="file" id="cameraInput" accept="image/*" style="display: none;">
 
-<div id="previewBox">
-<img id="previewImg" alt="食物照片預覽">
-<button class="btn-action" id="analyzeBtn" onclick="runAnalysis()">🔥 執行 AI 營養分析</button>
-</div>
+    <div id="previewBox">
+      <img id="previewImg" alt="食物照片預覽">
+      <button class="btn-action" id="analyzeBtn" onclick="runAnalysis()">🔥 執行 AI 營養分析</button>
+    </div>
 
-<div id="statusBox"></div>
-</div>
+    <div id="statusBox"></div>
+  </div>
 
-<!-- 4. 本餐拆解明細 -->
-<div class="card" id="resultCard" style="display: none;">
-<h2>🍽️ 本餐拆解明細</h2>
-<div id="mealItems"></div>
-<div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
-<h3 style="margin: 0 0 6px 0; font-size: 0.95rem;">💡 營養師洞察與下餐指引</h3>
-<div id="coachInsights" style="font-size: 0.85rem; line-height: 1.5; color: var(--text-sub);"></div>
-</div>
-</div>
+  <!-- 4. 本餐拆解明細 -->
+  <div class="card" id="resultCard" style="display: none;">
+    <h2>🍽️ 本餐拆解明細</h2>
+    <div id="mealItems"></div>
+    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
+      <h3 style="margin: 0 0 6px 0; font-size: 0.95rem;">💡 營養師洞察與下餐指引</h3>
+      <div id="coachInsights" style="font-size: 0.85rem; line-height: 1.5; color: var(--text-sub);"></div>
+    </div>
+  </div>
 
-<script>
-let userProfile = JSON.parse(localStorage.getItem('app_user_profile')) || null;
-let GOALS = JSON.parse(localStorage.getItem('app_user_goals')) || null;
-let totals = JSON.parse(localStorage.getItem('user_daily_totals')) || {
-cal: 0, pro: 0, carb: 0, fat: 0, fib: 0, sod: 0, water: 0
-};
+  <script>
+    // 安全載入暫存，防止髒資料毀損腳本
+    function safeLoad(key, fallback) {
+      try {
+        const item = localStorage.getItem(key);
+        return (item && item !== "undefined") ? JSON.parse(item) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
 
-const apiKeyInput = document.getElementById('apiKey');
-const userNoteInput = document.getElementById('userNote');
-const cameraInput = document.getElementById('cameraInput');
-const previewBox = document.getElementById('previewBox');
-const previewImg = document.getElementById('previewImg');
-const statusBox = document.getElementById('statusBox');
-const analyzeBtn = document.getElementById('analyzeBtn');
-let currentBase64 = "";
+    let userProfile = safeLoad('app_user_profile', null);
+    let GOALS = safeLoad('app_user_goals', null);
+    let totals = safeLoad('user_daily_totals', {
+      cal: 0, pro: 0, carb: 0, fat: 0, fib: 0, sod: 0, water: 0
+    });
 
-// 自動讀取使用者自己裝置暫存的金鑰（新使用者打開時為空白）
-if (localStorage.getItem('gemini_api_key')) {
-apiKeyInput.value = localStorage.getItem('gemini_api_key');
-}
-apiKeyInput.addEventListener('input', () => {
-localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
-});
+    const apiKeyInput = document.getElementById('apiKey');
+    const userNoteInput = document.getElementById('userNote');
+    const cameraInput = document.getElementById('cameraInput');
+    const previewBox = document.getElementById('previewBox');
+    const previewImg = document.getElementById('previewImg');
+    const statusBox = document.getElementById('statusBox');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    let currentBase64 = "";
 
-function toggleSection(id) {
-const el = document.getElementById(id);
-const isHide = el.style.display === 'none';
-el.style.display = isHide ? 'block' : 'none';
-document.getElementById('toggleIcon').innerText = isHide ? '[收合]' : '[展開設定]';
-}
+    try {
+      if (localStorage.getItem('gemini_api_key')) {
+        apiKeyInput.value = localStorage.getItem('gemini_api_key');
+      }
+    } catch(e) {}
 
-function syncProfileInputs() {
-if (!userProfile) return;
-document.getElementById('userGender').value = userProfile.gender || 'male';
-document.getElementById('userAge').value = userProfile.age || '';
-document.getElementById('userHeight').value = userProfile.height || '';
-document.getElementById('userWeight').value = userProfile.weight || '';
-document.getElementById('userGoalLoss').value = userProfile.goalLoss || '';
-document.getElementById('userDays').value = userProfile.days || '';
-}
+    apiKeyInput.addEventListener('input', () => {
+      try { localStorage.setItem('gemini_api_key', apiKeyInput.value.trim()); } catch(e) {}
+    });
 
-function applyProfile() {
-const age = Number(document.getElementById('userAge').value);
-const height = Number(document.getElementById('userHeight').value);
-const weight = Number(document.getElementById('userWeight').value);
-const goalLoss = Number(document.getElementById('userGoalLoss').value);
-const days = Number(document.getElementById('userDays').value);
+    function syncProfileInputs() {
+      if (!userProfile) return;
+      document.getElementById('userGender').value = userProfile.gender || 'male';
+      document.getElementById('userAge').value = userProfile.age || '';
+      document.getElementById('userHeight').value = userProfile.height || '';
+      document.getElementById('userWeight').value = userProfile.weight || '';
+      document.getElementById('userGoalLoss').value = userProfile.goalLoss || '';
+      document.getElementById('userDays').value = userProfile.days || '';
+    }
 
-if (!age || !height || !weight || !goalLoss || !days) {
-return alert('請完整填寫性別、年齡、身高、體重、預計減重公斤數與天數！');
-}
+    function applyProfile() {
+      const age = Number(document.getElementById('userAge').value);
+      const height = Number(document.getElementById('userHeight').value);
+      const weight = Number(document.getElementById('userWeight').value);
+      const goalLoss = Number(document.getElementById('userGoalLoss').value);
+      const days = Number(document.getElementById('userDays').value);
 
-userProfile = {
-gender: document.getElementById('userGender').value,
-age: age,
-height: height,
-weight: weight,
-goalLoss: goalLoss,
-days: days
-};
+      if (!age || !height || !weight || !goalLoss || !days) {
+        return alert('請完整填寫性別、年齡、身高、體重、預計減重公斤數與天數！');
+      }
 
-let bmr = (10 * userProfile.weight) + (6.25 * userProfile.height) - (5 * userProfile.age);
-bmr += (userProfile.gender === 'male') ? 5 : -161;
+      userProfile = {
+        gender: document.getElementById('userGender').value,
+        age: age,
+        height: height,
+        weight: weight,
+        goalLoss: goalLoss,
+        days: days
+      };
 
-let tdee = Math.round(bmr * 1.2);
-let dailyDeficit = Math.round((userProfile.goalLoss * 7700) / userProfile.days);
+      let bmr = (10 * userProfile.weight) + (6.25 * userProfile.height) - (5 * userProfile.age);
+      bmr += (userProfile.gender === 'male') ? 5 : -161;
 
-let targetCal = tdee - dailyDeficit;
-if (targetCal < bmr) targetCal = Math.round(bmr);
-if (targetCal < 1400) targetCal = 1400;
+      let tdee = Math.round(bmr * 1.2);
+      let dailyDeficit = Math.round((userProfile.goalLoss * 7700) / userProfile.days);
+      
+      let targetCal = tdee - dailyDeficit;
+      if (targetCal < bmr) targetCal = Math.round(bmr);
+      if (targetCal < 1400) targetCal = 1400;
 
-let targetPro = Math.round(userProfile.weight * 1.3);
-let targetFat = Math.round((targetCal * 0.25) / 9);
-let targetCarb = Math.round((targetCal - (targetPro * 4 + targetFat * 9)) / 4);
-let targetWater = Math.round(userProfile.weight * 35);
+      let targetPro = Math.round(userProfile.weight * 1.3);
+      let targetFat = Math.round((targetCal * 0.25) / 9);
+      let targetCarb = Math.round((targetCal - (targetPro * 4 + targetFat * 9)) / 4);
+      let targetWater = Math.round(userProfile.weight * 35);
 
-GOALS = {
-cal: targetCal,
-pro: targetPro,
-carb: targetCarb,
-fat: targetFat,
-fib: 30,
-sod: 2300,
-water: targetWater
-};
+      GOALS = {
+        cal: targetCal,
+        pro: targetPro,
+        carb: targetCarb,
+        fat: targetFat,
+        fib: 30,
+        sod: 2300,
+        water: targetWater
+      };
 
-localStorage.setItem('app_user_profile', JSON.stringify(userProfile));
-localStorage.setItem('app_user_goals', JSON.stringify(GOALS));
+      try {
+        localStorage.setItem('app_user_profile', JSON.stringify(userProfile));
+        localStorage.setItem('app_user_goals', JSON.stringify(GOALS));
+      } catch(e) {}
 
-document.getElementById('planSummary').innerHTML = ✅ &lt;strong&gt;專屬計畫已更新：&lt;/strong&gt;&lt;br&gt; BMR: ${Math.round(bmr)} kcal ｜ TDEE: ${tdee} kcal&lt;br&gt; 每日目標赤字約 ${tdee - targetCal} kcal，預期 ${userProfile.days} 天平穩達標！;
+      document.getElementById('planSummary').innerHTML = `
+        ✅ <strong>專屬計畫已更新：</strong><br>
+        BMR: ${Math.round(bmr)} kcal ｜ TDEE: ${tdee} kcal<br>
+        每日目標赤字約 ${tdee - targetCal} kcal，預期 ${userProfile.days} 天平穩達標！
+      `;
 
-updateUI();
-toggleSection('profileForm');
-alert('專屬減重目標已重新計算並套用！');
-}
+      updateUI();
+      document.getElementById('profileDetails').removeAttribute('open');
+      alert('專屬減重目標已重新計算並套用！');
+    }
 
-function updateUI() {
-if (GOALS) {
-document.getElementById('goal-cal').innerText = GOALS.cal;
-document.getElementById('goal-pro').innerText = GOALS.pro;
-document.getElementById('goal-carb').innerText = GOALS.carb;
-document.getElementById('goal-fat').innerText = GOALS.fat;
-document.getElementById('goal-water').innerText = GOALS.water;
+    function updateUI() {
+      if (GOALS) {
+        document.getElementById('goal-cal').innerText = GOALS.cal;
+        document.getElementById('goal-pro').innerText = GOALS.pro;
+        document.getElementById('goal-carb').innerText = GOALS.carb;
+        document.getElementById('goal-fat').innerText = GOALS.fat;
+        document.getElementById('goal-water').innerText = GOALS.water;
 
-document.getElementById('bar-cal').style.width = Math.min(100, (totals.cal / GOALS.cal) * 100) + '%';
-document.getElementById('bar-pro').style.width = Math.min(100, (totals.pro / GOALS.pro) * 100) + '%';
-document.getElementById('bar-carb').style.width = Math.min(100, (totals.carb / GOALS.carb) * 100) + '%';
-document.getElementById('bar-fat').style.width = Math.min(100, (totals.fat / GOALS.fat) * 100) + '%';
-document.getElementById('bar-water').style.width = Math.min(100, (totals.water / GOALS.water) * 100) + '%';
-}
+        document.getElementById('bar-cal').style.width = Math.min(100, (totals.cal / GOALS.cal) * 100) + '%';
+        document.getElementById('bar-pro').style.width = Math.min(100, (totals.pro / GOALS.pro) * 100) + '%';
+        document.getElementById('bar-carb').style.width = Math.min(100, (totals.carb / GOALS.carb) * 100) + '%';
+        document.getElementById('bar-fat').style.width = Math.min(100, (totals.fat / GOALS.fat) * 100) + '%';
+        document.getElementById('bar-water').style.width = Math.min(100, (totals.water / GOALS.water) * 100) + '%';
+      }
 
-document.getElementById('cal-cur').innerText = totals.cal;
-document.getElementById('pro-cur').innerText = totals.pro;
-document.getElementById('carb-cur').innerText = totals.carb;
-document.getElementById('fat-cur').innerText = totals.fat;
-document.getElementById('fib-cur').innerText = totals.fib;
-document.getElementById('sod-cur').innerText = totals.sod;
-document.getElementById('water-cur').innerText = totals.water;
+      document.getElementById('cal-cur').innerText = totals.cal;
+      document.getElementById('pro-cur').innerText = totals.pro;
+      document.getElementById('carb-cur').innerText = totals.carb;
+      document.getElementById('fat-cur').innerText = totals.fat;
+      document.getElementById('fib-cur').innerText = totals.fib;
+      document.getElementById('sod-cur').innerText = totals.sod;
+      document.getElementById('water-cur').innerText = totals.water;
 
-document.getElementById('bar-sod').style.width = Math.min(100, (totals.sod / 2300) * 100) + '%';
+      document.getElementById('bar-sod').style.width = Math.min(100, (totals.sod / 2300) * 100) + '%';
 
-localStorage.setItem('user_daily_totals', JSON.stringify(totals));
-}
+      try { localStorage.setItem('user_daily_totals', JSON.stringify(totals)); } catch(e) {}
+    }
 
-function addWater(amount) {
-totals.water += amount;
-updateUI();
-}
+    function addWater(amount) {
+      totals.water += amount;
+      updateUI();
+    }
 
-function resetAll() {
-if (confirm('確定要將今天的紀錄歸零重置嗎？')) {
-totals = { cal: 0, pro: 0, carb: 0, fat: 0, fib: 0, sod: 0, water: 0 };
-updateUI();
-document.getElementById('resultCard').style.display = 'none';
-}
-}
+    function resetAll() {
+      if (confirm('確定要將今天的紀錄歸零重置嗎？')) {
+        totals = { cal: 0, pro: 0, carb: 0, fat: 0, fib: 0, sod: 0, water: 0 };
+        updateUI();
+        document.getElementById('resultCard').style.display = 'none';
+      }
+    }
 
-cameraInput.addEventListener('change', function(e) {
-const file = e.target.files[0];
-if (!file) return;
+    cameraInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-const reader = new FileReader();
-reader.onload = function(evt) {
-const img = new Image();
-img.onload = function() {
-const canvas = document.createElement('canvas');
-const max = 1000;
-let w = img.width, h = img.height;
-if (w > h && w > max) { h = Math.round(h * max / w); w = max; }
-else if (h > max) { w = Math.round(w * max / h); h = max; }
-canvas.width = w; canvas.height = h;
-canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const max = 1000;
+          let w = img.width, h = img.height;
+          if (w > h && w > max) { h = Math.round(h * max / w); w = max; }
+          else if (h > max) { w = Math.round(w * max / h); h = max; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-const compressed = canvas.toDataURL('image/jpeg', 0.85);
-previewImg.src = compressed;
-currentBase64 = compressed.split(',')[1];
-previewBox.style.display = 'block';
-analyzeBtn.disabled = false;
-analyzeBtn.innerText = '🔥 執行 AI 營養分析';
-statusBox.style.display = 'none';
-};
-img.src = evt.target.result;
-};
-reader.readAsDataURL(file);
-});
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          previewImg.src = compressed;
+          currentBase64 = compressed.split(',')[1];
+          previewBox.style.display = 'block';
+          analyzeBtn.disabled = false;
+          analyzeBtn.innerText = '🔥 執行 AI 營養分析';
+          statusBox.style.display = 'none';
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
-async function runAnalysis() {
-const key = apiKeyInput.value.trim();
-if (!key) return alert('請先在欄位中貼上你的 Gemini API Key！');
+    async function runAnalysis() {
+      const key = apiKeyInput.value.trim();
+      if (!key) return alert('請先在欄位中貼上你的 Gemini API Key！');
+      
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerText = '⏳ 分析中...';
+      statusBox.style.display = 'block';
+      statusBox.style.background = '#e2e8f0';
+      statusBox.style.color = '#334155';
+      statusBox.innerText = '正在結合個人專屬目標進行智能分析...';
 
-analyzeBtn.disabled = true;
-analyzeBtn.innerText = '⏳ 分析中...';
-statusBox.style.display = 'block';
-statusBox.style.background = '#e2e8f0';
-statusBox.style.color = '#334155';
-statusBox.innerText = '正在結合個人專屬目標進行智能分析...';
+      const remCal = GOALS ? Math.max(0, GOALS.cal - totals.cal) : '尚未設定';
+      const remPro = GOALS ? Math.max(0, GOALS.pro - totals.pro) : '尚未設定';
+      const userWeight = userProfile ? userProfile.weight : '未提供';
+      const userHeight = userProfile ? userProfile.height : '未提供';
+      const goalCal = GOALS ? GOALS.cal : '一般健康維持';
+      const goalPro = GOALS ? GOALS.pro : '一般健康維持';
 
-const remCal = GOALS ? Math.max(0, GOALS.cal - totals.cal) : '尚未設定';
-const remPro = GOALS ? Math.max(0, GOALS.pro - totals.pro) : '尚未設定';
-const userWeight = userProfile ? userProfile.weight : '未提供';
-const userHeight = userProfile ? userProfile.height : '未提供';
-const goalCal = GOALS ? GOALS.cal : '一般健康維持';
-const goalPro = GOALS ? GOALS.pro : '一般健康維持';
-
-const prompt = `你是一位資深臨床營養師。分析照片，回傳純 JSON 格式，請勿使用任何 Markdown 格式或代碼框：
+      const prompt = `你是一位資深臨床營養師。分析照片，回傳純 JSON 格式，請勿使用任何 Markdown 格式或代碼框：
 {
-"items": [
-{"name": "品項名稱", "portion": "份量預估", "cal": 100, "pro": 2, "carb": 20, "fat": 1, "fib": 2, "sod": 10, "note": "備註說明"}
- ],
-"total": {"cal": 100, "pro": 2, "carb": 20, "fat": 1, "fib": 2, "sod": 10},
-"insights": "針對當前減重目標的優劣評析與消腫指引",
-"next_meal": "下一餐具體推薦超商或外食組合（考量剩餘預算）"
+  "items": [
+    {"name": "品項名稱", "portion": "份量預估", "cal": 100, "pro": 2, "carb": 20, "fat": 1, "fib": 2, "sod": 10, "note": "備註說明"}
+  ],
+  "total": {"cal": 100, "pro": 2, "carb": 20, "fat": 1, "fib": 2, "sod": 10},
+  "insights": "針對當前減重目標的優劣評析與消腫指引",
+  "next_meal": "下一餐具體推薦超商或外食組合（考量剩餘預算）"
 }
 使用者專屬減重目標參數：
-• 體重：{userHeight}cm
-• 每日目標熱量：{remCal} kcal）
-• 每日目標蛋白質：{remPro} g）
-• 隱形熱量法則：炒青菜外加 5-8g 油；炸裹粉外加 10-15g 脂肪；羹湯滷汁外加糖與高鈉。
-使用者餐點備註：${userNoteInput.value.trim() || '無'};
+- 體重：${userWeight}kg ｜ 身高：${userHeight}cm
+- 每日目標熱量：${goalCal} kcal（目前今天剩餘可用約：${remCal} kcal）
+- 每日目標蛋白質：${goalPro} g（目前今天還差：${remPro} g）
+- 隱形熱量法則：炒青菜外加 5-8g 油；炸裹粉外加 10-15g 脂肪；羹湯滷汁外加糖與高鈉。
+使用者餐點備註：${userNoteInput.value.trim() || '無'}`;
 
-const apiUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${key}`;
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${key}`;
 
-try {
-const res = await fetch(apiUrl, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({
-contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: currentBase64 } }] }]
-})
-});
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: currentBase64 } }] }]
+          })
+        });
 
-const data = await res.json();
-if (data.error) throw new Error(data.error.message);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
 
-const rawText = data.candidates[0].content.parts[0].text;
-const match = rawText.match(/{[\s\S]*}/);
-if (!match) throw new Error('模型回傳格式非有效 JSON，請再按一次重試。');
-const result = JSON.parse(match[0]);
+        const rawText = data.candidates[0].content.parts[0].text;
+        const match = rawText.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error('模型回傳格式非有效 JSON，請再按一次重試。');
+        const result = JSON.parse(match[0]);
 
-totals.cal += Number(result.total.cal) || 0;
-totals.pro += Number(result.total.pro) || 0;
-totals.carb += Number(result.total.carb) || 0;
-totals.fat += Number(result.total.fat) || 0;
-totals.fib += Number(result.total.fib) || 0;
-totals.sod += Number(result.total.sod) || 0;
-updateUI();
+        totals.cal += Number(result.total.cal) || 0;
+        totals.pro += Number(result.total.pro) || 0;
+        totals.carb += Number(result.total.carb) || 0;
+        totals.fat += Number(result.total.fat) || 0;
+        totals.fib += Number(result.total.fib) || 0;
+        totals.sod += Number(result.total.sod) || 0;
+        updateUI();
 
-const itemsDiv = document.getElementById('mealItems');
-itemsDiv.innerHTML = result.items.map(item => &lt;div class="food-item"&gt; &lt;div&gt; &lt;strong&gt;${item.name}</strong> <span style="font-size:0.8rem; color:#64748b;">(${item.portion})&lt;/span&gt;&lt;br&gt; &lt;span style="font-size:0.75rem; color:#94a3b8;"&gt;${item.note || ''}</span>
-</div>
-<div style="text-align: right;">
-<div><strong>${item.cal}&lt;/strong&gt; kcal&lt;/div&gt; &lt;div style="font-size:0.75rem; color:#64748b;"&gt;P:${item.pro}g / C:${item.carb}g / F:${item.fat}g</div>
-</div>
-</div>
-`).join('');
+        const itemsDiv = document.getElementById('mealItems');
+        itemsDiv.innerHTML = result.items.map(item => `
+          <div class="food-item">
+            <div>
+              <strong>${item.name}</strong> <span style="font-size:0.8rem; color:#64748b;">(${item.portion})</span><br>
+              <span style="font-size:0.75rem; color:#94a3b8;">${item.note || ''}</span>
+            </div>
+            <div style="text-align: right;">
+              <div><strong>${item.cal}</strong> kcal</div>
+              <div style="font-size:0.75rem; color:#64748b;">P:${item.pro}g / C:${item.carb}g / F:${item.fat}g</div>
+            </div>
+          </div>
+        `).join('');
 
-document.getElementById('coachInsights').innerHTML = &lt;p&gt;&lt;strong&gt;💡 評析：&lt;/strong&gt;${result.insights}</p>
-<p><strong>🍱 下一餐建議：</strong>${result.next_meal}</p>
-`;
+        document.getElementById('coachInsights').innerHTML = `
+          <p><strong>💡 評析：</strong>${result.insights}</p>
+          <p><strong>🍱 下一餐建議：</strong>${result.next_meal}</p>
+        `;
 
-document.getElementById('resultCard').style.display = 'block';
-statusBox.style.display = 'none';
-analyzeBtn.innerText = '✅ 分析完成';
-} catch (err) {
-statusBox.style.background = '#fee2e2';
-statusBox.style.color = '#b91c1c';
-statusBox.innerText = '執行失敗：' + err.message;
-analyzeBtn.disabled = false;
-analyzeBtn.innerText = '🔥 重新執行';
-}
-}
+        document.getElementById('resultCard').style.display = 'block';
+        statusBox.style.display = 'none';
+        analyzeBtn.innerText = '✅ 分析完成';
+      } catch (err) {
+        statusBox.style.background = '#fee2e2';
+        statusBox.style.color = '#b91c1c';
+        statusBox.innerText = '執行失敗：' + err.message;
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerText = '🔥 重新執行';
+      }
+    }
 
-syncProfileInputs();
-updateUI();
-</script>
+    syncProfileInputs();
+    updateUI();
+  </script>
 </body>
 </html>
