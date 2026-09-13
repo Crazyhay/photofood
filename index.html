@@ -19,10 +19,6 @@
     .card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
     h2 { margin: 0 0 14px 0; font-size: 1.15rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
     
-    /* 原生展開樣式優化 */
-    details summary { list-style: none; cursor: pointer; outline: none; user-select: none; }
-    details summary::-webkit-details-marker { display: none; }
-    
     .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
     .input-col { flex: 1; }
     .input-col label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; font-weight: bold; }
@@ -43,65 +39,61 @@
     .bar-sodium { background: var(--danger); }
     .bar-water { background: var(--info); }
 
-    .btn-camera { display: block; width: 100%; padding: 14px; background: var(--primary); color: #fff; text-align: center; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    .btn-camera { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; text-align: center; }
     .btn-action { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
     .btn-action:disabled { background: #94a3b8; }
     .btn-small { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
-    .btn-save { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 4px; }
+    .btn-save { width: 100%; padding: 12px; background: #3b82f6; color: #fff; border: none; border-radius: 10px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-top: 4px; }
 
     #previewBox { display: none; margin-top: 14px; text-align: center; }
     #previewImg { width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; }
     #statusBox { margin-top: 10px; font-size: 0.85rem; padding: 10px; border-radius: 8px; display: none; line-height: 1.4; }
     .food-item { border-bottom: 1px solid var(--border); padding: 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
     .food-item:last-child { border-bottom: none; }
+    .key-hint { font-size: 0.75rem; margin-top: 4px; margin-bottom: 8px; color: var(--text-sub); }
   </style>
 </head>
 <body>
 
-  <!-- 1. 原生免 JS 展開卡片 -->
-  <details class="card" id="profileDetails">
-    <summary style="display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 1.15rem; font-weight: 700;">⚙️ 個人目標設定</span>
-      <span style="font-size: 0.85rem; color: var(--info);">[點擊展開/收合]</span>
-    </summary>
-    <div style="margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 12px;">
-      <div class="input-row">
-        <div class="input-col">
-          <label>性別</label>
-          <select id="userGender">
-            <option value="male">男性</option>
-            <option value="female">女性</option>
-          </select>
-        </div>
-        <div class="input-col">
-          <label>年齡</label>
-          <input type="number" id="userAge" placeholder="例：30">
-        </div>
-        <div class="input-col">
-          <label>身高 (cm)</label>
-          <input type="number" id="userHeight" placeholder="例：175">
-        </div>
+  <!-- 1. 個人目標設定 -->
+  <div class="card">
+    <h2>⚙️ 個人目標設定</h2>
+    <div class="input-row">
+      <div class="input-col">
+        <label>性別</label>
+        <select id="userGender">
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
       </div>
-      <div class="input-row">
-        <div class="input-col">
-          <label>目前體重 (kg)</label>
-          <input type="number" id="userWeight" placeholder="例：80" step="0.1">
-        </div>
-        <div class="input-col">
-          <label>想減體重 (kg)</label>
-          <input type="number" id="userGoalLoss" placeholder="例：5" step="0.5">
-        </div>
-        <div class="input-col">
-          <label>預計天數 (天)</label>
-          <input type="number" id="userDays" placeholder="例：30">
-        </div>
+      <div class="input-col">
+        <label>年齡</label>
+        <input type="number" id="userAge" placeholder="例：30">
       </div>
-      <button class="btn-save" onclick="applyProfile()">💾 計算並套用專屬減重目標</button>
-      <div id="planSummary" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; line-height: 1.4;"></div>
+      <div class="input-col">
+        <label>身高 (cm)</label>
+        <input type="number" id="userHeight" placeholder="例：175">
+      </div>
     </div>
-  </details>
+    <div class="input-row">
+      <div class="input-col">
+        <label>目前體重 (kg)</label>
+        <input type="number" id="userWeight" placeholder="例：80" step="0.1">
+      </div>
+      <div class="input-col">
+        <label>想減體重 (kg)</label>
+        <input type="number" id="userGoalLoss" placeholder="例：5" step="0.5">
+      </div>
+      <div class="input-col">
+        <label>預計天數 (天)</label>
+        <input type="number" id="userDays" placeholder="例：30">
+      </div>
+    </div>
+    <button class="btn-save" onclick="applyProfile()">💾 計算並套用專屬減重目標</button>
+    <div id="planSummary" style="font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; line-height: 1.4;"></div>
+  </div>
 
-  <!-- 2. 全日動態看板 -->
+  <!-- 2. 今日全日看板 -->
   <div class="card">
     <h2>
       📊 今日全日看板
@@ -156,10 +148,12 @@
   <div class="card">
     <h2>📸 記錄餐點</h2>
     <input type="password" id="apiKey" placeholder="請在此貼上 Gemini API Key (以 AIzaSy 開頭)">
-    <input type="text" id="userNote" placeholder="餐點備註（例：外食偏油、白飯吃一半）">
+    <div id="keyStatusHint" class="key-hint">🔒 輸入一次後將自動保存於本機，下次免再輸入</div>
+    
+    <input type="text" id="userNote" placeholder="餐點備註（例：外食偏油、白飯吃一半）" style="margin-top: 4px; margin-bottom: 12px;">
 
-    <label for="cameraInput" class="btn-camera">📷 拍照或選取照片</label>
-    <input type="file" id="cameraInput" accept="image/*" style="display: none;">
+    <button type="button" class="btn-camera" onclick="triggerFileInput()">📷 拍照或選取照片</button>
+    <input type="file" id="cameraInput" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
 
     <div id="previewBox">
       <img id="previewImg" alt="食物照片預覽">
@@ -180,7 +174,6 @@
   </div>
 
   <script>
-    // 安全載入暫存，防止髒資料毀損腳本
     function safeLoad(key, fallback) {
       try {
         const item = localStorage.getItem(key);
@@ -197,6 +190,7 @@
     });
 
     const apiKeyInput = document.getElementById('apiKey');
+    const keyStatusHint = document.getElementById('keyStatusHint');
     const userNoteInput = document.getElementById('userNote');
     const cameraInput = document.getElementById('cameraInput');
     const previewBox = document.getElementById('previewBox');
@@ -205,14 +199,30 @@
     const analyzeBtn = document.getElementById('analyzeBtn');
     let currentBase64 = "";
 
+    // 頁面初始化：自動讀取本機儲存的 API Key
     try {
-      if (localStorage.getItem('gemini_api_key')) {
-        apiKeyInput.value = localStorage.getItem('gemini_api_key');
+      const savedKey = localStorage.getItem('gemini_api_key');
+      if (savedKey) {
+        apiKeyInput.value = savedKey;
+        keyStatusHint.innerText = '✅ 本機已記住金鑰，可直接拍照分析（點擊可更換）';
+        keyStatusHint.style.color = '#10b981';
       }
     } catch(e) {}
 
-    apiKeyInput.addEventListener('input', () => {
-      try { localStorage.setItem('gemini_api_key', apiKeyInput.value.trim()); } catch(e) {}
+    // 多重事件監聽：輸入、貼上、點擊離開欄位時，立刻寫入 localStorage
+    ['input', 'change', 'blur', 'paste'].forEach(evtType => {
+      apiKeyInput.addEventListener(evtType, () => {
+        setTimeout(() => {
+          const val = apiKeyInput.value.trim();
+          if (val) {
+            try {
+              localStorage.setItem('gemini_api_key', val);
+              keyStatusHint.innerText = '✅ 本機已記住金鑰，可直接拍照分析（點擊可更換）';
+              keyStatusHint.style.color = '#10b981';
+            } catch(e) {}
+          }
+        }, 100);
+      });
     });
 
     function syncProfileInputs() {
@@ -282,7 +292,6 @@
       `;
 
       updateUI();
-      document.getElementById('profileDetails').removeAttribute('open');
       alert('專屬減重目標已重新計算並套用！');
     }
 
@@ -327,38 +336,71 @@
       }
     }
 
+    function triggerFileInput() {
+      cameraInput.value = '';
+      cameraInput.click();
+    }
+
     cameraInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const img = new Image();
-        img.onload = function() {
+      statusBox.style.display = 'block';
+      statusBox.style.background = '#e2e8f0';
+      statusBox.style.color = '#334155';
+      statusBox.innerText = '正在讀取並壓縮照片...';
+
+      const blobUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = function() {
+        try {
           const canvas = document.createElement('canvas');
           const max = 1000;
-          let w = img.width, h = img.height;
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+
           if (w > h && w > max) { h = Math.round(h * max / w); w = max; }
           else if (h > max) { w = Math.round(w * max / h); h = max; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const compressed = canvas.toDataURL('image/jpeg', 0.82);
           previewImg.src = compressed;
           currentBase64 = compressed.split(',')[1];
+
           previewBox.style.display = 'block';
           analyzeBtn.disabled = false;
           analyzeBtn.innerText = '🔥 執行 AI 營養分析';
           statusBox.style.display = 'none';
-        };
-        img.src = evt.target.result;
+
+          URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+          statusBox.style.background = '#fee2e2';
+          statusBox.style.color = '#b91c1c';
+          statusBox.innerText = '照片處理失敗：' + err.message;
+        }
       };
-      reader.readAsDataURL(file);
+
+      img.onerror = function() {
+        statusBox.style.background = '#fee2e2';
+        statusBox.style.color = '#b91c1c';
+        statusBox.innerText = '照片格式無法載入，請重新拍攝或選擇其他照片。';
+        URL.revokeObjectURL(blobUrl);
+      };
+
+      img.src = blobUrl;
     });
 
     async function runAnalysis() {
       const key = apiKeyInput.value.trim();
       if (!key) return alert('請先在欄位中貼上你的 Gemini API Key！');
+      
+      // 點擊分析時再次強制持久化儲存
+      try { localStorage.setItem('gemini_api_key', key); } catch(e) {}
       
       analyzeBtn.disabled = true;
       analyzeBtn.innerText = '⏳ 分析中...';
